@@ -1,0 +1,1 @@
+﻿rename _app.config to app.config and populate the settings with your values.
