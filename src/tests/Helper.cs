@@ -4,12 +4,10 @@ using System.IO;
 using System.Net;
 using NUnit.Framework;
 
-
 namespace McGiv.AWS.SES.Tests
 {
 	public static class Helper
 	{
-
 		/// <summary>
 		/// Generates credentials from app settings
 		/// </summary>
@@ -23,7 +21,7 @@ namespace McGiv.AWS.SES.Tests
 		public static AwsCredentials GetCredentials(string key)
 		{
 			return new AwsCredentials(ConfigurationManager.AppSettings["AccessKeyID"],
-									  key);
+			                          key);
 		}
 
 
@@ -45,12 +43,10 @@ namespace McGiv.AWS.SES.Tests
 			{
 				using (WebResponse response = request.GetResponse())
 				{
-
 					//Console.WriteLine(((HttpWebResponse) response).StatusDescription);
 
-					using (var dataStream = response.GetResponseStream())
+					using (Stream dataStream = response.GetResponseStream())
 					{
-
 						if (dataStream == null)
 						{
 							Assert.Fail("GetResponseStream is null");
@@ -58,25 +54,17 @@ namespace McGiv.AWS.SES.Tests
 
 						using (var reader = new StreamReader(dataStream))
 						{
-
 							string responseFromServer = reader.ReadToEnd();
 
 							Console.WriteLine(responseFromServer);
-
 						}
-
 					}
 				}
 			}
 			catch (Exception e)
 			{
 				Assert.Fail(e.Message);
-
 			}
-
-
-
 		}
-
 	}
 }

@@ -57,7 +57,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncStreamReader.cs" />
     <Compile Include="Commands\DeleteVerifiedEmailAddressCommandTests.cs" />
+    <Compile Include="Commands\ListVerifiedEmailAddressesCommandTests.cs" />
+    <Compile Include="Commands\SendEmailTests.cs" />
+    <Compile Include="Commands\SendQuotaTests.cs" />
+    <Compile Include="Commands\SendStatisticsTests.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="RequestBuilderFormatDataTests.cs" />
     <Compile Include="RequestSignerTests.cs" />

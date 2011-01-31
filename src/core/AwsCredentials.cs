@@ -1,7 +1,5 @@
-﻿
-namespace McGiv.AWS.SES
+﻿namespace McGiv.AWS.SES
 {
-
 	/// <summary>
 	/// Stores the public and private keys 
 	/// 

@@ -1,4 +1,8 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.IO;
+using System.Net;
+using System.Text;
+using NUnit.Framework;
 
 namespace McGiv.AWS.SES.Tests
 {
@@ -6,22 +10,51 @@ namespace McGiv.AWS.SES.Tests
 	[Ignore("This will cause AWS to send an email to the email address used. Run test by commenting out this attribute.")]
 	public class VerifyEmailTests
 	{
+		private readonly CommandRequestBuilder builder = new CommandRequestBuilder(new RequestSigner(Helper.GetCredentials()));
+		private readonly VerifierEmailAddressCommandResponseParser parser = new VerifierEmailAddressCommandResponseParser();
 
-		readonly CommandRequestBuilder builder = new CommandRequestBuilder(new RequestSigner(Helper.GetCredentials()));
+
+		private static void FinishWebRequest(IAsyncResult result)
+		{
+			var response = (HttpWebResponse) ((HttpWebRequest) result.AsyncState).EndGetResponse(result);
+
+			//using (var dataStream = response.GetResponseStream())
+			Stream dataStream = response.GetResponseStream();
+			{
+				if (dataStream == null)
+				{
+					Assert.Fail("GetResponseStream is null");
+				}
+
+				new AsyncStreamReader(dataStream, data =>
+				                                  	{
+				                                  		response.Close();
+
+				                                  		ProcessRequest(data);
+				                                  	});
+			}
+		}
+
+		private static void ProcessRequest(byte[] data)
+		{
+			string resp = Encoding.ASCII.GetString(data);
+
+			Console.WriteLine(resp);
+		}
 
 		[Test]
 		public void VerifyTest()
 		{
 			var cmd = new VerifyEmailAddressCommand
-			{
-				EmailAddress = Helper.GetSenderEmailAddress()
-			};
+			          	{
+			          		EmailAddress = Helper.GetSenderEmailAddress()
+			          	};
 
 
-			var request = builder.Build(cmd);
+			var cp = new CommandProcessor(builder);
 
-			Helper.ProcessRequest(request);
 
+			Console.WriteLine(cp.Process(cmd, parser).RequestID);
 		}
 	}
 }

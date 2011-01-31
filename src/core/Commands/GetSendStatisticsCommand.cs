@@ -2,12 +2,13 @@
 
 namespace McGiv.AWS.SES
 {
-
 	/// <summary>
 	/// http://docs.amazonwebservices.com/ses/latest/APIReference/index.html?API_GetSendStatistics.html
 	/// </summary>
 	public class GetSendStatisticsCommand : ICommand
 	{
+		#region ICommand Members
+
 		public string Action
 		{
 			get { return "GetSendStatistics"; }
@@ -17,5 +18,12 @@ namespace McGiv.AWS.SES
 		{
 			return null;
 		}
+
+		#endregion
+	}
+
+
+	public class SendStatistics
+	{
 	}
 }

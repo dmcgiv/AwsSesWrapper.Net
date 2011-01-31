@@ -1,32 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Web;
 
-
 namespace McGiv.AWS.SES
 {
-
-
-
 	/// <summary>
-	/// Builds a HTTP request for SES commands
+	/// Builds a web request for SES commands
 	/// </summary>
 	public class CommandRequestBuilder
 	{
-
-		private readonly RequestSigner _signer;
 		private readonly string _address;
+		private readonly RequestSigner _signer;
 
 		public CommandRequestBuilder(RequestSigner signer)
-				: this(signer, "https://email.us-east-1.amazonaws.com")
+			: this(signer, "https://email.us-east-1.amazonaws.com")
 		{
-
 		}
 
 		public CommandRequestBuilder(RequestSigner signer, string address)
-		
+
 		{
 			if (signer == null)
 			{
@@ -39,12 +34,10 @@ namespace McGiv.AWS.SES
 				throw new ArgumentNullException("address");
 			}
 
-			
-			this._address = address;
+
+			_address = address;
 			_signer = signer;
 		}
-
-
 
 
 		/// <summary>
@@ -54,11 +47,17 @@ namespace McGiv.AWS.SES
 		/// <returns></returns>
 		public string FormatData(ICommand command)
 		{
+			if (command == null)
+			{
+				throw new ArgumentNullException("command");
+			}
+
+
 			var sb = new StringBuilder();
 			sb.Append("Action=");
 			sb.Append(HttpUtility.UrlEncode(command.Action));
 
-			var d = command.GetData();
+			Dictionary<string, string> d = command.GetData();
 			if (d != null)
 			{
 				foreach (string key in d.Keys)
@@ -68,17 +67,14 @@ namespace McGiv.AWS.SES
 					sb.Append('=');
 					sb.Append(HttpUtility.UrlEncode(d[key]));
 				}
-
 			}
 
 			return sb.ToString();
 		}
-		
-
 
 
 		/// <summary>
-		/// Generates a web request based on the given command.
+		/// Creates a web request based on the given command.
 		/// </summary>
 		/// <param name="command"></param>
 		/// <returns></returns>
@@ -89,7 +85,7 @@ namespace McGiv.AWS.SES
 				throw new ArgumentNullException("command");
 			}
 
-			var request = (HttpWebRequest)WebRequest.Create(this._address);
+			var request = (HttpWebRequest) WebRequest.Create(_address);
 
 			request.Method = "POST";
 			request.ContentType = "application/x-www-form-urlencoded";
@@ -100,8 +96,10 @@ namespace McGiv.AWS.SES
 
 
 			// add data
-			byte[] byteArray = Encoding.UTF8.GetBytes(FormatData(command));
+			byte[] byteArray = GetData(command);
 			request.ContentLength = byteArray.Length;
+
+			// possible WebException when resolving domain
 			using (Stream dataStream = request.GetRequestStream())
 			{
 				dataStream.Write(byteArray, 0, byteArray.Length);
@@ -109,11 +107,33 @@ namespace McGiv.AWS.SES
 			}
 
 
+			return request;
+		}
+
+
+		public byte[] GetData(ICommand command)
+		{
+			return Encoding.ASCII.GetBytes(FormatData(command));
+		}
+
+
+		/// <summary>
+		/// Creates a web request but with no command data.
+		/// </summary>
+		/// <returns></returns>
+		public HttpWebRequest Build()
+		{
+			var request = (HttpWebRequest) WebRequest.Create(_address);
+
+			request.Method = "POST";
+			request.ContentType = "application/x-www-form-urlencoded";
+
+
+			// sign
+			_signer.SignRequest(request);
+
 
 			return request;
-
-
-
 		}
 	}
 }

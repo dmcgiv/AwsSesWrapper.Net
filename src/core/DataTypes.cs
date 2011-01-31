@@ -1,14 +1,12 @@
-﻿using System.Collections.Generic;
-
+﻿using System;
+using System.Collections.Generic;
 
 namespace McGiv.AWS.SES
 {
-
-
 	/// <summary>
 	/// http://docs.amazonwebservices.com/ses/latest/APIReference/API_Destination.html
 	/// </summary>
-	[System.Serializable]
+	[Serializable]
 	public class Destination
 	{
 		public Destination()
@@ -24,43 +22,40 @@ namespace McGiv.AWS.SES
 	}
 
 
-
-
 	/// <summary>
 	/// see http://docs.amazonwebservices.com/ses/latest/APIReference/API_Message.html
 	/// </summary>
-	[System.Serializable]
+	[Serializable]
 	public class Message
 	{
 		public Message()
 		{
-			this.Body = new Body();
-			this.Subject = new Content();
+			Body = new Body();
+			Subject = new Content();
 		}
 
 		/// <summary>
 		/// Required
 		/// </summary>
-		public Body Body { get;  set; }
+		public Body Body { get; set; }
 
 		/// <summary>
 		/// Required
 		/// </summary>
-		public Content Subject { get;  set; }
+		public Content Subject { get; set; }
 	}
-
 
 
 	/// <summary>
 	/// see http://docs.amazonwebservices.com/ses/latest/APIReference/API_Body.html
 	/// </summary>
-	[System.Serializable]
+	[Serializable]
 	public class Body
 	{
 		public Body()
 		{
-			this.Html = new Content();
-			this.Text = new Content();
+			Html = new Content();
+			Text = new Content();
 		}
 
 		public Content Html { get; set; }
@@ -68,11 +63,10 @@ namespace McGiv.AWS.SES
 	}
 
 
-
 	/// <summary>
 	/// http://docs.amazonwebservices.com/ses/latest/APIReference/API_Content.html
 	/// </summary>
-	[System.Serializable]
+	[Serializable]
 	public class Content
 	{
 		public string Charset { get; set; }
@@ -83,12 +77,4 @@ namespace McGiv.AWS.SES
 		/// </summary>
 		public string Data { get; set; }
 	}
-
-
-
-
-
-
-
-
 }
