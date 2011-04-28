@@ -58,6 +58,12 @@ namespace McGiv.AWS.SES
 			//    return new Task<T>(()=> new T{ Exception = task.Exception});
 			//}
 
+			using (var debug = new StreamReader(new MemoryStream(task.Result)))
+			{
+				Console.WriteLine(debug.ReadToEnd());
+
+			}
+
 			return Task<T>.Factory.StartNew(() =>
 			                                	{
 			                                		using (var stream = new MemoryStream(task.Result))
@@ -72,7 +78,7 @@ namespace McGiv.AWS.SES
 			return Task<byte[]>.Factory.StartNew(
 				() =>
 					{
-						Exception exception = null;
+						//Exception exception = null;
 						byte[] responseData = null;
 
 						Task getRequestStreamTask = Task.Factory.FromAsync<Stream>(request.BeginGetRequestStream,
@@ -81,7 +87,9 @@ namespace McGiv.AWS.SES
 							              	{
 							              		if (task.Exception != null)
 							              		{
-							              			exception = task.Exception;
+													// usually DNS issue or server unresponsive
+							              			//exception = task.Exception;
+							              			throw task.Exception;
 							              			return;
 							              		}
 
@@ -107,40 +115,49 @@ namespace McGiv.AWS.SES
 						getRequestStreamTask.Wait();
 
 
-						if(exception != null)
-						{
-							return null;
-						}
+						//if(exception != null)
+						//{
+						//    return null;
+						//}
 
+
+						
 
 						// get response
 						Task requestTask = Task.Factory.FromAsync<WebResponse>(request.BeginGetResponse, request.EndGetResponse, null,
 						                                                       TaskCreationOptions.AttachedToParent)
 							.ContinueWith(task =>
 							              	{
+
+												//HttpWebResponse response = null;
+
+
 							              		if (task.Exception != null)
 							              		{
 							              			//exception = task.Exception;
-							              			return;
+
+													if (task.Exception.InnerException is WebException)
+													{
+														var webException = (WebException)task.Exception.InnerException;
+
+														var response = webException.Response as HttpWebResponse;
+
+														if (response != null && response.StatusCode == (HttpStatusCode)400)
+														{
+															//responseData = GetData(response);
+
+															var error = new ErrorResponseParser().Process(response.GetResponseStream());
+
+															throw new AwsSesException(error, task.Exception.InnerException);
+														}
+													}
+
+
+							              			throw task.Exception;
 							              		}
 
-
-							              		using (var response = (HttpWebResponse) task.Result)
-							              		{
-							              			Stream inStream = response.GetResponseStream();
-
-							              			if (inStream == null)
-							              			{
-							              				throw new InvalidOperationException("GetResponseStream stream is null");
-							              				//return;
-							              			}
-
-							              			using (inStream)
-							              			{
-							              				responseData = GetResponseData(inStream,
-							              				                               response.ContentLength > 0 ? response.ContentLength : 1024);
-							              			}
-							              		}
+												responseData = GetData((HttpWebResponse)task.Result);
+			
 							              	}
 							);
 
@@ -152,7 +169,27 @@ namespace McGiv.AWS.SES
 		}
 
 
-		public static byte[] GetResponseData(Stream inStream, long bufferSize)
+
+		static byte[] GetData(WebResponse response)
+		{
+			using (response)
+			{
+				Stream inStream = response.GetResponseStream();
+
+				if (inStream != null)
+				{
+					using (inStream)
+					{
+						return GetResponseData(inStream,
+													   response.ContentLength > 0 ? response.ContentLength : 1024);
+					}
+				}
+			}
+
+			return null;
+		}
+
+		static byte[] GetResponseData(Stream inStream, long bufferSize)
 		{
 			// read response data into memory buffer
 

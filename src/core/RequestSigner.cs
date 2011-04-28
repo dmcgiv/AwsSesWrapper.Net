@@ -10,8 +10,8 @@ namespace McGiv.AWS.SES
 	/// </summary>
 	public enum RequestSignerAlgorithm
 	{
-		HmacSHA1 = 1,
-		HmacSHA256 = 2
+		HmacSha1 = 1,
+		HmacSha256 = 2
 	}
 
 	/// <summary>
@@ -22,14 +22,9 @@ namespace McGiv.AWS.SES
 	{
 		private readonly KeyedHashAlgorithm _algorithm;
 		private readonly AwsCredentials _credentials;
-		private readonly Func<string, byte[]> getBytes = Encoding.ASCII.GetBytes;
+		private readonly Func<string, byte[]> _getBytes = Encoding.ASCII.GetBytes;
 
-		public RequestSigner(AwsCredentials credentials)
-			: this(credentials, RequestSignerAlgorithm.HmacSHA1)
-		{
-		}
-
-		public RequestSigner(AwsCredentials credentials, RequestSignerAlgorithm algorithm)
+		public RequestSigner(AwsCredentials credentials, RequestSignerAlgorithm algorithm = RequestSignerAlgorithm.HmacSha1)
 		{
 			if (credentials == null)
 			{
@@ -39,13 +34,13 @@ namespace McGiv.AWS.SES
 
 			switch (algorithm)
 			{
-				case RequestSignerAlgorithm.HmacSHA1:
+				case RequestSignerAlgorithm.HmacSha1:
 					{
 						_algorithm = new HMACSHA1();
 						break;
 					}
 
-				case RequestSignerAlgorithm.HmacSHA256:
+				case RequestSignerAlgorithm.HmacSha256:
 					{
 						_algorithm = new HMACSHA256();
 						break;
@@ -59,7 +54,7 @@ namespace McGiv.AWS.SES
 
 
 			_credentials = credentials;
-			_algorithm.Key = getBytes(_credentials.SecretAccessKey);
+			_algorithm.Key = _getBytes(_credentials.SecretAccessKey);
 			RequestSignerAlgorithm = algorithm;
 		}
 
@@ -77,8 +72,9 @@ namespace McGiv.AWS.SES
 
 
 			// sign request with request date
-			string date = request.Date.ToString("ddd, dd MMM yyyy HH:mm:ss ") + "GMT";
-				// e.g Tue, 25 May 2010 23:05:27 GMT // todo make more generic
+			string date = request.Date.ToUniversalTime().ToString("ddd, dd MMM yyyy HH:mm:ss ") + "GMT";
+
+			// e.g Tue, 25 May 2010 23:05:27 GMT // todo make more generic
 			var sb = new StringBuilder();
 			sb.Append("AWS3-HTTPS AWSAccessKeyId=");
 			sb.Append(_credentials.AccessKeyID);
@@ -87,13 +83,13 @@ namespace McGiv.AWS.SES
 			sb.Append(", Algorithm=");
 			switch (RequestSignerAlgorithm)
 			{
-				case RequestSignerAlgorithm.HmacSHA1:
+				case RequestSignerAlgorithm.HmacSha1:
 					{
 						sb.Append("HmacSHA1");
 						break;
 					}
 
-				case RequestSignerAlgorithm.HmacSHA256:
+				case RequestSignerAlgorithm.HmacSha256:
 					{
 						sb.Append("HmacSHA256");
 						break;
@@ -117,7 +113,7 @@ namespace McGiv.AWS.SES
 		{
 			return Convert.ToBase64String(
 				_algorithm.ComputeHash(
-					getBytes(data)
+					_getBytes(data)
 					)
 				);
 		}

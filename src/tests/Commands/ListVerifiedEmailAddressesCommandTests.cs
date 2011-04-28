@@ -7,8 +7,8 @@ namespace McGiv.AWS.SES.Tests.Commands
 	[TestFixture]
 	public class ListVerifiedEmailAddressesCommandTests
 	{
-		private readonly CommandRequestBuilder builder = new CommandRequestBuilder(new RequestSigner(Helper.GetCredentials()));
-		private readonly ListVerifiedEmailAddressesResponseParser parser = new ListVerifiedEmailAddressesResponseParser();
+		private readonly CommandRequestBuilder _builder = new CommandRequestBuilder(new RequestSigner(Helper.GetCredentials()));
+		private readonly ListVerifiedEmailAddressesResponseParser _parser = new ListVerifiedEmailAddressesResponseParser();
 
 
 		[Test]
@@ -16,10 +16,11 @@ namespace McGiv.AWS.SES.Tests.Commands
 		{
 			var cmd = new ListVerifiedEmailAddressesCommand();
 
-			var cp = new CommandProcessor(builder);
+			var cp = new CommandProcessor(_builder);
+			var resp = cp.Process(cmd, _parser);
+			Console.WriteLine(resp.Command + " : ID " +  resp.RequestID);
 
-
-			foreach (string email in cp.Process(cmd, new ListVerifiedEmailAddressesResponseParser()))
+			foreach (string email in resp.Emails)
 			{
 				Console.WriteLine(email);
 			}

@@ -26,7 +26,7 @@ namespace McGiv.AWS.SES
 	}
 
 	[Serializable]
-	public class SendQuote
+	public class GetSendQuoteResponse : CommandResponse
 	{
 		public float SentLast24Hours { get; set; }
 		public float Max24HourSend { get; set; }
@@ -34,7 +34,7 @@ namespace McGiv.AWS.SES
 	}
 
 
-	public class GetSendQuoteResponseParser : ICommandResponseParser<SendQuote>
+	public class GetSendQuoteResponseParser : ICommandResponseParser<GetSendQuoteResponse>
 	{
 		// example
 		/*
@@ -52,13 +52,16 @@ namespace McGiv.AWS.SES
 
 		#region ICommandResponseParser<SendQuote> Members
 
-		public SendQuote Process(Stream input)
+		public GetSendQuoteResponse Process(Stream input)
 		{
-			var quota = new SendQuote();
+			var quota = new GetSendQuoteResponse();
+			quota.Command = "GetSendQuotaResponse";
+
 			using (XmlReader reader = XmlReader.Create(input))
 			{
-				reader.MoveToContent();
-
+				//reader.MoveToContent();
+				reader.ReadStartElement(quota.Command);
+				reader.ReadStartElement("GetSendQuotaResult");
 				while (reader.Read())
 				{
 					if (reader.NodeType == XmlNodeType.Element)

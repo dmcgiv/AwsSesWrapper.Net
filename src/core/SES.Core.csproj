@@ -57,6 +57,9 @@
     <Compile Include="DataTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestSigner.cs" />
+    <Compile Include="Response\ErrorResponse.cs" />
+    <Compile Include="Response\ResponseParser.cs" />
+    <Compile Include="Response\SuccessfulResponse.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

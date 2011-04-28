@@ -89,7 +89,8 @@ namespace McGiv.AWS.SES
 
 			request.Method = "POST";
 			request.ContentType = "application/x-www-form-urlencoded";
-
+			request.Headers.Set("Pragma", "no-cache");
+			request.AllowAutoRedirect = false;
 
 			// sign
 			_signer.SignRequest(request);
@@ -127,6 +128,9 @@ namespace McGiv.AWS.SES
 
 			request.Method = "POST";
 			request.ContentType = "application/x-www-form-urlencoded";
+			request.Headers.Set("Pragma", "no-cache");
+			request.AllowAutoRedirect = false;
+			
 
 
 			// sign

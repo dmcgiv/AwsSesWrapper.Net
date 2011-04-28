@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace McGiv.AWS.SES.Tests
 {
 	// todo break up into individual command tests
-	[TestFixture]
+	//[TestFixture]
 	public class CommandTests
 	{
 		

@@ -27,4 +27,12 @@ namespace McGiv.AWS.SES
 
 		#endregion
 	}
+
+	public class DeleteVerifiedEmailAddressCommandResponseParser : CommandResponseParser
+	{
+		public DeleteVerifiedEmailAddressCommandResponseParser()
+			: base("DeleteVerifiedEmailAddressResponse")
+		{
+		}
+	}
 }

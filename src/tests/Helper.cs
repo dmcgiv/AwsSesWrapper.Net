@@ -15,13 +15,13 @@ namespace McGiv.AWS.SES.Tests
 		public static AwsCredentials GetCredentials()
 		{
 			return new AwsCredentials(ConfigurationManager.AppSettings["AccessKeyID"],
-			                          ConfigurationManager.AppSettings["SecretAccessKey"]);
+									  ConfigurationManager.AppSettings["SecretAccessKey"]);
 		}
 
 		public static AwsCredentials GetCredentials(string key)
 		{
 			return new AwsCredentials(ConfigurationManager.AppSettings["AccessKeyID"],
-			                          key);
+									  key);
 		}
 
 
@@ -61,8 +61,32 @@ namespace McGiv.AWS.SES.Tests
 					}
 				}
 			}
-			catch (Exception e)
+			catch (WebException e)
 			{
+
+				using (var response = e.Response)
+				{
+					var httpResponse = (HttpWebResponse) response;
+					//if (httpResponse.StatusCode != (HttpStatusCode)400)
+					//{
+						
+					//}
+					using (var dataStream = httpResponse.GetResponseStream())
+					{
+						if (dataStream == null)
+						{
+							Assert.Fail("GetResponseStream is null");
+						}
+
+						using (var reader = new StreamReader(dataStream))
+						{
+							string responseFromServer = reader.ReadToEnd();
+
+							Console.WriteLine(responseFromServer);
+						}
+					}
+				}
+
 				Assert.Fail(e.Message);
 			}
 		}

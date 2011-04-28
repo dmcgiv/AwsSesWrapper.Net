@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Web;
 using NUnit.Framework;
 
@@ -40,9 +41,14 @@ namespace McGiv.AWS.SES.Tests
 			          	};
 
 
-			HttpWebRequest request = _builder.Build(cmd);
+			
 
-			Helper.ProcessRequest(request);
+			var cp = new CommandProcessor(_builder);
+
+			var resp = cp.Process(cmd, new DeleteVerifiedEmailAddressCommandResponseParser());
+
+			Console.WriteLine(resp.Command + " : ID " + resp.RequestID);
+
 		}
 	}
 }

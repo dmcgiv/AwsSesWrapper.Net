@@ -9,7 +9,7 @@ namespace McGiv.AWS.SES.Tests.Commands
 	[TestFixture]
 	public class SendQuotaTests
 	{
-		private readonly CommandRequestBuilder builder = new CommandRequestBuilder(new RequestSigner(Helper.GetCredentials()));
+		private readonly CommandRequestBuilder _builder = new CommandRequestBuilder(new RequestSigner(Helper.GetCredentials()));
 
 		[Test]
 		public void SendQuota()
@@ -22,12 +22,14 @@ namespace McGiv.AWS.SES.Tests.Commands
 			//Helper.ProcessRequest(request);
 
 
-			var cp = new CommandProcessor(builder);
+			var cp = new CommandProcessor(_builder);
 
-			SendQuote quote = cp.Process(cmd, new GetSendQuoteResponseParser());
-			Console.WriteLine("Max24HourSend = " + quote.Max24HourSend);
-			Console.WriteLine("MaxSendRate = " + quote.MaxSendRate);
-			Console.WriteLine("SentLast24Hours = " + quote.SentLast24Hours);
+			GetSendQuoteResponse resp = cp.Process(cmd, new GetSendQuoteResponseParser());
+			Console.WriteLine(resp.Command + " : ID " + resp.RequestID);
+
+			Console.WriteLine("Max24HourSend = " + resp.Max24HourSend);
+			Console.WriteLine("MaxSendRate = " + resp.MaxSendRate);
+			Console.WriteLine("SentLast24Hours = " + resp.SentLast24Hours);
 		}
 
 
@@ -40,8 +42,8 @@ namespace McGiv.AWS.SES.Tests.Commands
 			for(int i=0; i<10; i++)
 			{
 				var cmd = new GetSendQuotaCommand();
-				var cp = new CommandProcessor(builder);
-				SendQuote quote = cp.Process(cmd, new GetSendQuoteResponseParser());
+				var cp = new CommandProcessor(_builder);
+				GetSendQuoteResponse quote = cp.Process(cmd, new GetSendQuoteResponseParser());
 			
 			}
 
@@ -55,12 +57,12 @@ namespace McGiv.AWS.SES.Tests.Commands
 			var sw = new Stopwatch();
 			sw.Start();
 
-			int count = 20;
-			var tasks = new Task<SendQuote>[count];
+			int count = 10;
+			var tasks = new Task<GetSendQuoteResponse>[count];
 			for (int i = 0; i < count; i++)
 			{
 				var cmd = new GetSendQuotaCommand();
-				var cp = new CommandProcessor(builder);
+				var cp = new CommandProcessor(_builder);
 				tasks[i] = cp.CreateTask(cmd, new GetSendQuoteResponseParser());
 
 			}

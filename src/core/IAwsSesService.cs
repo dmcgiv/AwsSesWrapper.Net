@@ -5,24 +5,13 @@ namespace McGiv.AWS.SES
 {
 	public class CommandResponse
 	{
-		//internal CommandResponse(string requestID, Exception exception)
-		//{
-		//    this.RequestID = requestID;
-		//    this.Exception = exception;
-		//}
-
-		public Exception Exception { get; internal set; }
+		public string Command { get; internal set; }
 		public string RequestID { get; internal set; }
 	}
 
 
 	public class CommandResponse<T> : CommandResponse
 	{
-		//internal CommandResponse(string requestID, Exception exception, T data)
-		//    : base(requestID, exception)
-		//{
-		//    this.Data = data;
-		//}
 
 		public T Data { get; internal set; }
 	}
@@ -36,7 +25,7 @@ namespace McGiv.AWS.SES
 
 		Task<CommandResponse> DeleteVerifiedEmailAddress(string address);
 
-		Task<CommandResponse<SendQuote>> GetSendQuote();
+		Task<CommandResponse<GetSendQuoteResponse>> GetSendQuote();
 
 		Task<CommandResponse<SendStatistics>> GetSendStatistics();
 	}
@@ -80,7 +69,7 @@ namespace McGiv.AWS.SES
 			throw new NotImplementedException();
 		}
 
-		public Task<CommandResponse<SendQuote>> GetSendQuote()
+		public Task<CommandResponse<GetSendQuoteResponse>> GetSendQuote()
 		{
 			throw new NotImplementedException();
 		}

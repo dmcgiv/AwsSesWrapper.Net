@@ -10,8 +10,8 @@ namespace McGiv.AWS.SES.Tests
 	[Ignore("This will cause AWS to send an email to the email address used. Run test by commenting out this attribute.")]
 	public class VerifyEmailTests
 	{
-		private readonly CommandRequestBuilder builder = new CommandRequestBuilder(new RequestSigner(Helper.GetCredentials()));
-		private readonly VerifierEmailAddressCommandResponseParser parser = new VerifierEmailAddressCommandResponseParser();
+		private readonly CommandRequestBuilder _builder = new CommandRequestBuilder(new RequestSigner(Helper.GetCredentials()));
+		private readonly VerifierEmailAddressCommandResponseParser _parser = new VerifierEmailAddressCommandResponseParser();
 
 
 		private static void FinishWebRequest(IAsyncResult result)
@@ -51,10 +51,12 @@ namespace McGiv.AWS.SES.Tests
 			          	};
 
 
-			var cp = new CommandProcessor(builder);
+			var cp = new CommandProcessor(_builder);
+
+			var resp = cp.Process(cmd, _parser);
 
 
-			Console.WriteLine(cp.Process(cmd, parser).RequestID);
+			Console.WriteLine(resp.Command + " : ID " +  resp.RequestID);
 		}
 	}
 }

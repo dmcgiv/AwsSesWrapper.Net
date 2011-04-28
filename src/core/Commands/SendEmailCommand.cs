@@ -41,7 +41,7 @@ namespace McGiv.AWS.SES
 			int i = 1;
 			foreach (string email in Destination.ToAddresses)
 			{
-				data.Add("Destination.ToAddresses.member" + (i++), email);
+				data.Add("Destination.ToAddresses.member." + (i++), email);
 			}
 			//data.Add("Destination.ToAddresses", string.Join("; ", this.Destination.ToAddresses));
 			//data.Add("Destination.CcAddresses", string.Join("; ", this.Destination.CcAddresses));
@@ -59,7 +59,7 @@ namespace McGiv.AWS.SES
 	}
 
 
-	public class SendInfo
+	public class SendInfo : CommandResponse
 	{
 		public string MessageID { get; set; }
 	}

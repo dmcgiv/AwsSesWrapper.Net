@@ -24,12 +24,16 @@ namespace McGiv.AWS.SES
 		#endregion
 	}
 
+	public class ListVerifiedEmailAddressesResponse : CommandResponse
+	{
+		public string[] Emails { get; internal set; }
+	}
 
-	public class ListVerifiedEmailAddressesResponseParser : ICommandResponseParser<string[]>
+	public class ListVerifiedEmailAddressesResponseParser : ICommandResponseParser<ListVerifiedEmailAddressesResponse>
 	{
 		#region ICommandResponseParser<string[]> Members
 
-		public string[] Process(Stream input)
+		public ListVerifiedEmailAddressesResponse Process(Stream input)
 		{
 //<ListVerifiedEmailAddressesResponse xmlns="http://ses.amazonaws.com/doc/2010-12-01/">
 //  <ListVerifiedEmailAddressesResult>
@@ -66,7 +70,11 @@ namespace McGiv.AWS.SES
 				}
 			}
 
-			return emails.ToArray();
+			return new ListVerifiedEmailAddressesResponse
+			       	{
+						Command = "ListVerifiedEmailAddressesResponse",
+			       		Emails = emails.ToArray()
+			       	};
 		}
 
 		#endregion
