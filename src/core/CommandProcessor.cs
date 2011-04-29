@@ -51,7 +51,23 @@ namespace McGiv.AWS.SES
 		{
 			Task<byte[]> task = CreatePostWebRequestTask(request, dataGetter);
 
-			task.Wait();
+			try
+			{
+				task.Wait();
+			}
+			catch (AggregateException e)
+			{
+				var awse = e.InnerException as AwsSesException;
+
+				if (awse != null)
+				{
+					Console.WriteLine("Code : " + awse.ErrorResponse.Code);
+					Console.WriteLine("RequestID : " + awse.ErrorResponse.RequestID);
+					Console.WriteLine("Type : " + awse.ErrorResponse.Type);
+				}
+				throw;
+			}
+			
 
 			//if(task.Exception != null)
 			//{

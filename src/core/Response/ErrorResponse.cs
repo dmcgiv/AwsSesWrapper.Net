@@ -24,7 +24,7 @@ namespace McGiv.AWS.SES
 		public AwsSesException(ErrorResponse error, Exception exception)
 			: base(error.Message, exception)
 		{
-			
+			this.ErrorResponse = error;
 		}
 		public ErrorResponse ErrorResponse { get; private set; }
 

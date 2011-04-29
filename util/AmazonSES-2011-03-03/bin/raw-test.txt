@@ -1,0 +1,13 @@
+X-Sender: test@domain.com
+X-Receiver: test@otherdomain.com
+Message-ID: <12343245.admin@nimtug.org>
+MIME-Version: 1.0
+From: test@domain.com
+To: test@otherdomain.com
+Date: 29 Apr 2011 01:53:34 +0100
+Subject: test email subject
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+
+this is some text
+

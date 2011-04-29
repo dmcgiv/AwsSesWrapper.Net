@@ -93,6 +93,11 @@ namespace McGiv.AWS.SES
 		 * */
 		public ErrorResponse Process(Stream input)
 		{
+			var r = new StreamReader(input);
+			Console.WriteLine(r.ReadToEnd());
+			input.Position = 0;
+
+
 			var data = new ErrorResponse();
 			using (XmlReader reader = XmlReader.Create(input))
 			{

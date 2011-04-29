@@ -35,9 +35,8 @@ namespace McGiv.AWS.SES
 
 		public Dictionary<string, string> GetData()
 		{
-			var data = new Dictionary<string, string>();
+			var data = new Dictionary<string, string> {{"Source", Source}};
 
-			data.Add("Source", Source);
 			int i = 1;
 			foreach (string email in Destination.ToAddresses)
 			{

@@ -22,6 +22,13 @@ namespace McGiv.AWS.SES
 	}
 
 
+	[Serializable]
+	public class RawMessage
+	{
+		public string Data { get; set; }
+	}
+
+
 	/// <summary>
 	/// see http://docs.amazonwebservices.com/ses/latest/APIReference/API_Message.html
 	/// </summary>

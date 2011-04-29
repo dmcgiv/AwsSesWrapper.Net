@@ -80,14 +80,14 @@ namespace McGiv.AWS.SES.Tests
 			cmd.Message.Subject.Data = "testing SES";
 			cmd.Message.Body.Html.Data = "<b>this is bold text</b>";
 			cmd.Message.Body.Text.Data = "this is not bold text";
-			cmd.Destination.ToAddresses.Add("sdfsdf@sdfsdfsdfsdf.com"); // Helper.GetRecipientEmailAddress());
+			cmd.Destination.ToAddresses.Add( Helper.GetRecipientEmailAddress());
 
 
 			
 			var cp = new CommandProcessor(_builder);
 			var resp = cp.Process(cmd, new SendEmailResponseParser());
 
-			
+			Console.WriteLine(resp.Command + " : ID " + resp.RequestID);
 
 			
 		}
