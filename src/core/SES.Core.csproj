@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>..\..\libs\bccrypto\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.CoreEx, Version=1.0.2838.104, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -46,6 +49,7 @@
     <Compile Include="AwsCredentials.cs" />
     <Compile Include="CommandProcessor.cs" />
     <Compile Include="Commands\SendRawEmailCommand.cs" />
+    <Compile Include="dkim\Canonicalization.cs" />
     <Compile Include="IAwsSesService.cs" />
     <Compile Include="RequestBuilder.cs" />
     <Compile Include="Commands\DeleteVerifiedEmailAddressCommand.cs" />
@@ -61,8 +65,8 @@
     <Compile Include="Response\ErrorResponse.cs" />
     <Compile Include="Response\ResponseParser.cs" />
     <Compile Include="Response\SuccessfulResponse.cs" />
+    <Compile Include="Util\DKIMSigner.cs" />
     <Compile Include="Util\MailMessageMemoryStream.cs" />
-    <Compile Include="Util\QPEncoging.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -30,11 +30,11 @@ namespace McGiv.AWS.SES.Util
 
 	public class RawEmailGenerator
 	{
-		public static string SendRawEmail(String from, String to, String subject, String text = null, String html = null, String replyTo = null, String returnPath = null)
+		public static byte[] SendRawEmail(Encoding encoding , string from, string to, string subject, string text = null, string html = null, string replyTo = null, string returnPath = null)
 		{
-			var encoding = Encoding.UTF8;
+			//var encoding = Encoding.UTF8;
 
-			AlternateView plainView = AlternateView.CreateAlternateViewFromString(text, encoding, "text/plain");
+			//AlternateView plainView = AlternateView.CreateAlternateViewFromString(text, encoding, "text/plain");
 			//AlternateView htmlView = AlternateView.CreateAlternateViewFromString(html, encoding, "text/html");
 
 			var mailMessage = new MailMessage();
@@ -45,18 +45,19 @@ namespace McGiv.AWS.SES.Util
 			
 			mailMessage.From = new MailAddress(from);
 
-			List<String> toAddresses = to.Replace(", ", ",").Split(',').ToList();
-			foreach (String toAddress in toAddresses)
+			List<string> toAddresses = to.Replace(", ", ",").Split(',').ToList();
+			foreach (string toAddress in toAddresses)
 			{
 				mailMessage.To.Add(new MailAddress(toAddress));
 			}
 
-			//foreach (String ccAddress in ccAddresses)
+
+			//foreach (string ccAddress in ccAddresses)
 			//{
 			//    mailMessage.CC.Add(new MailAddress(ccAddress));
 			//}
 
-			//foreach (String bccAddress in bccAddresses)
+			//foreach (string bccAddress in bccAddresses)
 			//{
 			//    mailMessage.Bcc.Add(new MailAddress(bccAddress));
 			//}
@@ -90,16 +91,10 @@ namespace McGiv.AWS.SES.Util
 
 			
 
-			var data = MailMessageMemoryStream.ConvertMailMessageToMemoryStream(mailMessage);
+			return MailMessageMemoryStream.ConvertMailMessageToMemoryStream(mailMessage);
 
-			//// strip X-Sender and S-Reciever which are at the top.
-			//var start = 0;
-			//start = data.IndexOf(Environment.NewLine, start );
-			//start = data.IndexOf(Environment.NewLine, start + Environment.NewLine.Length);
 
-			//return data.Substring(start + Environment.NewLine.Length);
-
-			return /*"Subject: test" + Environment.NewLine + */data;
+			//return Convert.ToBase64String(data, 0, data.Length);
 
 
 
@@ -115,7 +110,7 @@ namespace McGiv.AWS.SES.Util
 	public class MailMessageMemoryStream
 	{
 
-		public static string ConvertMailMessageToMemoryStream(MailMessage message)
+		public static byte[] ConvertMailMessageToMemoryStream(MailMessage message)
 		{
 			Assembly assembly = typeof(SmtpClient).Assembly;
 
@@ -157,9 +152,10 @@ namespace McGiv.AWS.SES.Util
 				//internalStream.Write(new byte[] { 13, 10 }, 0, 2);
 				internalStream.Position = 0;
 
-				var buffer = new byte[internalStream.Capacity];
-				var i = internalStream.Read(buffer, 0, internalStream.Capacity);
-				return Convert.ToBase64String(buffer, 0, i);
+				var buffer = new byte[internalStream.Length];
+				var i = internalStream.Read(buffer, 0, (int)internalStream.Length);
+				return buffer;
+				//return Convert.ToBase64String(buffer, 0, i);
 				//string data = null;
 				//using (var reader = new StreamReader(internalStream))
 				//{

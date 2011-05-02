@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using McGiv.AWS.SES.Commands;
 using McGiv.AWS.SES.Util;
 using NUnit.Framework;
@@ -17,8 +18,8 @@ namespace McGiv.AWS.SES.Tests.Commands
 			{
 				Source = Helper.GetSenderEmailAddress(),
 
-				RawData = RawEmailGenerator.SendRawEmail(Helper.GetSenderEmailAddress(), Helper.GetRecipientEmailAddress(), "test email subject", "this is some text",
-			             "<p>this is some html</p><p>asdasd asdasd</p>")
+				RawData = Convert.ToBase64String(RawEmailGenerator.SendRawEmail(Encoding.ASCII, Helper.GetSenderEmailAddress(), Helper.GetRecipientEmailAddress(), "test email subject", "this is some text",
+			             "<p>this is some html</p><p>asdasd asdasd</p>"))
 			};
 
 
