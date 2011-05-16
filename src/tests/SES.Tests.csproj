@@ -62,7 +62,6 @@
     <Compile Include="Commands\SendQuotaTests.cs" />
     <Compile Include="Commands\SendStatisticsTests.cs" />
     <Compile Include="Helper.cs" />
-    <Compile Include="Queue.cs" />
     <Compile Include="RequestBuilderFormatDataTests.cs" />
     <Compile Include="RequestSignerTests.cs" />
     <Compile Include="Commands\CommandTests.cs" />
