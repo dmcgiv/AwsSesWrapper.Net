@@ -12,15 +12,14 @@ namespace McGiv.AWS.SES
 	/// </summary>
 	public class CommandRequestBuilder
 	{
-		private readonly string _address;
-		private readonly RequestSigner _signer;
+		private readonly string _endpoint;
+		
+		//public CommandRequestBuilder(RequestSigner signer)
+		//    : this(signer, "https://email.us-east-1.amazonaws.com")
+		//{
+		//}
 
-		public CommandRequestBuilder(RequestSigner signer)
-			: this(signer, "https://email.us-east-1.amazonaws.com")
-		{
-		}
-
-		public CommandRequestBuilder(RequestSigner signer, string address)
+		public CommandRequestBuilder(RequestSigner signer, string endpoint = "https://email.us-east-1.amazonaws.com")
 
 		{
 			if (signer == null)
@@ -29,16 +28,17 @@ namespace McGiv.AWS.SES
 			}
 
 
-			if (address == null)
+			if (endpoint == null)
 			{
-				throw new ArgumentNullException("address");
+				throw new ArgumentNullException("endpoint");
 			}
 
 
-			_address = address;
-			_signer = signer;
+			_endpoint = endpoint;
+			Signer = signer;
 		}
 
+		public RequestSigner Signer { get; private set; }
 
 		/// <summary>
 		/// Formats the command data so that it can be used in a POST web request
@@ -85,7 +85,7 @@ namespace McGiv.AWS.SES
 				throw new ArgumentNullException("command");
 			}
 
-			var request = (HttpWebRequest) WebRequest.Create(_address);
+			var request = (HttpWebRequest) WebRequest.Create(_endpoint);
 
 			request.Method = "POST";
 			request.ContentType = "application/x-www-form-urlencoded";
@@ -93,7 +93,7 @@ namespace McGiv.AWS.SES
 			request.AllowAutoRedirect = false;
 
 			// sign
-			_signer.SignRequest(request);
+			Signer.SignRequest(request);
 
 
 			// add data
@@ -124,7 +124,7 @@ namespace McGiv.AWS.SES
 		/// <returns></returns>
 		public HttpWebRequest Build()
 		{
-			var request = (HttpWebRequest) WebRequest.Create(_address);
+			var request = (HttpWebRequest) WebRequest.Create(_endpoint);
 
 			request.Method = "POST";
 			request.ContentType = "application/x-www-form-urlencoded";
@@ -134,7 +134,7 @@ namespace McGiv.AWS.SES
 
 
 			// sign
-			_signer.SignRequest(request);
+			Signer.SignRequest(request);
 
 
 			return request;

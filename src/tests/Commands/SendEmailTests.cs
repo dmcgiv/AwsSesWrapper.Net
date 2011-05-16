@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Net;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
@@ -25,15 +24,17 @@ namespace McGiv.AWS.SES.Tests
 				          		Source = Helper.GetSenderEmailAddress(),
 				          	};
 
+				
 				cmd.Message.Subject.Data = "testing SES";
 				cmd.Message.Body.Html.Data = "<b>this is bold text</b>";
 				cmd.Message.Body.Text.Data = "this is not bold text";
 				cmd.Destination.ToAddresses.Add(Helper.GetRecipientEmailAddress());
 
 				var cp = new CommandProcessor(_builder);
-				SendInfo quote = cp.Process(cmd, new SendEmailResponseParser());
+				SendEmailResponse response = cp.Process(cmd, new SendEmailResponseParser());
 
-
+				Console.WriteLine(response.Command + " : ID " + response.RequestID);
+				Console.WriteLine(response.Command + " : MessageID " + response.MessageID);
 			}
 
 			sw.Stop();
@@ -46,8 +47,8 @@ namespace McGiv.AWS.SES.Tests
 			var sw = new Stopwatch();
 			sw.Start();
 
-			int count = 20;
-			var tasks = new Task<SendInfo>[count];
+			const int count = 20;
+			var tasks = new Task<SendEmailResponse>[count];
 			for (int i = 0; i < count; i++)
 			{
 				var cmd = new SendEmailCommand
@@ -88,6 +89,7 @@ namespace McGiv.AWS.SES.Tests
 			var resp = cp.Process(cmd, new SendEmailResponseParser());
 
 			Console.WriteLine(resp.Command + " : ID " + resp.RequestID);
+			Console.WriteLine(resp.Command + " : MessageID " + resp.MessageID);
 
 			
 		}

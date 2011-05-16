@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Net;
 using System.Web;
 using NUnit.Framework;
 
 namespace McGiv.AWS.SES.Tests
 {
 	[TestFixture]
+	//[Ignore]
 	public class DeleteVerifiedEmailAddressCommandTests
 	{
 		private readonly CommandRequestBuilder _builder = new CommandRequestBuilder(new RequestSigner(Helper.GetCredentials()));
@@ -45,7 +45,7 @@ namespace McGiv.AWS.SES.Tests
 
 			var cp = new CommandProcessor(_builder);
 
-			var resp = cp.Process(cmd, new DeleteVerifiedEmailAddressCommandResponseParser());
+			var resp = cp.Process(cmd, new DeleteVerifiedEmailAddressResponseParser());
 
 			Console.WriteLine(resp.Command + " : ID " + resp.RequestID);
 

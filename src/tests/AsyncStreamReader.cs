@@ -6,7 +6,7 @@ namespace McGiv.AWS.SES.Tests
 {
 	public class AsyncStreamReader
 	{
-		private const int defaultBufferSize = 1024;
+		private const int DefaultBufferSize = 1024;
 		private readonly List<byte> _all;
 		private readonly byte[] _buffer;
 		private readonly int _bufferSize;
@@ -15,7 +15,7 @@ namespace McGiv.AWS.SES.Tests
 		//private int _offset;
 
 		public AsyncStreamReader(Stream stream, Action<byte[]> completed)
-			: this(stream, completed, defaultBufferSize)
+			: this(stream, completed, DefaultBufferSize)
 		{
 		}
 

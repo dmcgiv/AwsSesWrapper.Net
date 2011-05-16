@@ -2,12 +2,12 @@
 using System.Net;
 using NUnit.Framework;
 
-namespace McGiv.AWS.SES.Tests.Commands
+namespace McGiv.AWS.SES.Tests
 {
 	[TestFixture]
 	public class SendStatisticsTests
 	{
-		private readonly CommandRequestBuilder builder = new CommandRequestBuilder(new RequestSigner(Helper.GetCredentials()));
+		private readonly CommandRequestBuilder _builder = new CommandRequestBuilder(new RequestSigner(Helper.GetCredentials()));
 
 
 		[Test]
@@ -16,15 +16,15 @@ namespace McGiv.AWS.SES.Tests.Commands
 			var cmd = new GetSendStatisticsCommand();
 
 
-			HttpWebRequest request = builder.Build(cmd);
+			HttpWebRequest request = _builder.Build(cmd);
 
 			Helper.ProcessRequest(request);
 
-			var cp = new CommandProcessor(builder);
+			var cp = new CommandProcessor(_builder);
 
-			var stats = cp.Process(cmd, new SendStatisticsResponseParser());
+			var stats = cp.Process(cmd, new GetSendStatisticsResponseParser());
 
-			foreach(var stat in stats)
+			foreach(var stat in stats.SendStatistics)
 			{
 				Console.WriteLine("DeliveryAttempts : " + stat.DeliveryAttempts);
 				Console.WriteLine("Timestamp : " + stat.Timestamp);

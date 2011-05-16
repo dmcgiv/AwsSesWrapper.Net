@@ -1,8 +1,7 @@
 ﻿using System;
-using System.IO;
 using NUnit.Framework;
 
-namespace McGiv.AWS.SES.Tests.Commands
+namespace McGiv.AWS.SES.Tests
 {
 	[TestFixture]
 	public class ListVerifiedEmailAddressesCommandTests
@@ -27,16 +26,16 @@ namespace McGiv.AWS.SES.Tests.Commands
 		}
 	}
 
-	public class ConsoleOutputParser : ICommandResponseParser<string>
-	{
-		#region ICommandResponseParser<string> Members
+	//public class ConsoleOutputParser : ICommandResponseParser<string>
+	//{
+	//    #region ICommandResponseParser<string> Members
 
-		public string Process(Stream input)
-		{
-			var reader = new StreamReader(input);
-			return reader.ReadToEnd();
-		}
+	//    public string Process(Stream input)
+	//    {
+	//        var reader = new StreamReader(input);
+	//        return reader.ReadToEnd();
+	//    }
 
-		#endregion
-	}
+	//    #endregion
+	//}
 }

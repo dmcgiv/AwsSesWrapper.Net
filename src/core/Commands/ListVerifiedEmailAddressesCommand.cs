@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml;
 
 namespace McGiv.AWS.SES
@@ -7,6 +7,7 @@ namespace McGiv.AWS.SES
 	/// <summary>
 	///  see http://docs.amazonwebservices.com/ses/latest/APIReference/index.html?API_ListVerifiedEmailAddresses.html
 	/// </summary>
+	[Serializable]
 	public class ListVerifiedEmailAddressesCommand : ICommand
 	{
 		#region ICommand Members
@@ -24,58 +25,68 @@ namespace McGiv.AWS.SES
 		#endregion
 	}
 
-	public class ListVerifiedEmailAddressesResponse : CommandResponse
+
+	[Serializable]
+	public class ListVerifiedEmailAddressesResponse : Response
 	{
 		public string[] Emails { get; internal set; }
 	}
 
-	public class ListVerifiedEmailAddressesResponseParser : ICommandResponseParser<ListVerifiedEmailAddressesResponse>
-	{
-		#region ICommandResponseParser<string[]> Members
 
-		public ListVerifiedEmailAddressesResponse Process(Stream input)
-		{
+
+	public class ListVerifiedEmailAddressesResponseParser : ResponseParser<ListVerifiedEmailAddressesResponse>
+	{
+
 //<ListVerifiedEmailAddressesResponse xmlns="http://ses.amazonaws.com/doc/2010-12-01/">
 //  <ListVerifiedEmailAddressesResult>
 //    <VerifiedEmailAddresses>
 //      <member>admin@nimtug.org</member>
+//      <member>damien.mcgivern@aurion.co.uk</member>
 //    </VerifiedEmailAddresses>
 //  </ListVerifiedEmailAddressesResult>
 //  <ResponseMetadata>
-//    <RequestId>56c399a3-2c9a-11e0-a410-ab87b662d75f</RequestId>
+//    <RequestId>5942b90d-7f24-11e0-94eb-9168216feecf</RequestId>
 //  </ResponseMetadata>
 //</ListVerifiedEmailAddressesResponse>
 
+		#region ICommandResponseParser<string[]> Members
 
+		public ListVerifiedEmailAddressesResponseParser()
+			: base("ListVerifiedEmailAddressesResponse")
+		{
+		}
+
+		protected override void InnerParse(XmlReader reader, ListVerifiedEmailAddressesResponse response)
+		{
 			var emails = new List<string>();
-			using (XmlReader reader = XmlReader.Create(input))
+			reader.ReadStartElement("ListVerifiedEmailAddressesResult");
+			bool lastElementWasMember = false;
+			while (reader.Read())
 			{
-				reader.MoveToContent();
-				bool lastElementWasMember = false;
-				while (reader.Read())
+				if (!lastElementWasMember && reader.NodeType == XmlNodeType.Element && reader.Name == "member")
 				{
-					if (!lastElementWasMember && reader.NodeType == XmlNodeType.Element && reader.Name == "member")
-					{
-						lastElementWasMember = true;
-					}
-					else if (lastElementWasMember && reader.NodeType == XmlNodeType.Text)
-					{
-						emails.Add(reader.Value);
-						lastElementWasMember = false;
-					}
-					else
-					{
-						lastElementWasMember = false;
-					}
+					lastElementWasMember = true;
+				}
+				else if (lastElementWasMember && reader.NodeType == XmlNodeType.Text)
+				{
+					emails.Add(reader.Value);
+					lastElementWasMember = false;
+				}
+				else if(reader.Name == "ResponseMetadata")
+				{
+					goto completed;
+				}
+				else
+				{
+					lastElementWasMember = false;
 				}
 			}
 
-			return new ListVerifiedEmailAddressesResponse
-			       	{
-						Command = "ListVerifiedEmailAddressesResponse",
-			       		Emails = emails.ToArray()
-			       	};
+			completed:
+			response.Emails = emails.ToArray();
 		}
+
+		
 
 		#endregion
 	}

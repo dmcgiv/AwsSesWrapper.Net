@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Xml;
 
 
-namespace McGiv.AWS.SES.Commands
+namespace McGiv.AWS.SES
 {
+	[Serializable]
 	public class SendRawEmailCommand : ICommand
 	{
 
@@ -46,11 +49,38 @@ namespace McGiv.AWS.SES.Commands
 	}
 
 
-	public class SendRawEmailCommandResponseParser : CommandResponseParser
+	public class SendRawEmailResponseParser : ResponseParser<SendEmailResponse>
 	{
-		public SendRawEmailCommandResponseParser()
+		public SendRawEmailResponseParser()
 			: base("SendRawEmailResponse")
 		{
 		}
+
+		protected override void InnerParse(XmlReader reader, SendEmailResponse response)
+		{
+
+			reader.ReadStartElement("SendRawEmailResult");
+			while (reader.Read())
+			{
+				if (reader.NodeType != XmlNodeType.Element)
+				{
+					continue;
+				}
+
+				switch (reader.Name)
+				{
+					case "MessageId":
+						{
+							response.MessageID = GetNextValue(reader);
+							break;
+						}
+					case "ResponseMetadata":
+						{
+							return;
+						}
+				}
+			}
+		}
+
 	}
 }

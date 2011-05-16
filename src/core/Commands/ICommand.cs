@@ -14,7 +14,10 @@ namespace McGiv.AWS.SES
 
 
 	public interface ICommandResponseParser<out T>
+		where T : Response
 	{
 		T Process(Stream input);
 	}
+
+	
 }

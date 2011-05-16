@@ -19,8 +19,14 @@ namespace McGiv.AWS.SES
 			_builder = builder;
 		}
 
+		public static CommandProcessor Create(AwsCredentials credentials)
+		{
+			return new CommandProcessor(new CommandRequestBuilder(new RequestSigner(credentials)));
+		}
+
 
 		public Task<T> CreateTask<T>(ICommand command, ICommandResponseParser<T> parser)
+			where T : Response
 			//where T : CommandResponse
 		{
 			HttpWebRequest request = _builder.Build();
@@ -28,6 +34,7 @@ namespace McGiv.AWS.SES
 		}
 
 		public T Process<T>(ICommand command, ICommandResponseParser<T> parser)
+			where T : Response
 		{
 			HttpWebRequest request = _builder.Build();
 
@@ -48,6 +55,7 @@ namespace McGiv.AWS.SES
 		public static Task<T> CreatePostWebRequestTask<T>(HttpWebRequest request, Func<byte[]> dataGetter,
 		                                                  ICommandResponseParser<T> commandResponseParser)
 			//where T  : Task<CommandResponse>, new()
+			where T : Response
 		{
 			Task<byte[]> task = CreatePostWebRequestTask(request, dataGetter);
 
@@ -106,7 +114,7 @@ namespace McGiv.AWS.SES
 													// usually DNS issue or server unresponsive
 							              			//exception = task.Exception;
 							              			throw task.Exception;
-							              			return;
+							              			//return;
 							              		}
 
 							              		// write data to request stream
@@ -158,7 +166,7 @@ namespace McGiv.AWS.SES
 
 														var response = webException.Response as HttpWebResponse;
 
-														if (response != null && response.StatusCode == (HttpStatusCode)400)
+														if (response != null && response.StatusCode !=  HttpStatusCode.OK)
 														{
 															//responseData = GetData(response);
 
@@ -172,7 +180,7 @@ namespace McGiv.AWS.SES
 							              			throw task.Exception;
 							              		}
 
-												responseData = GetData((HttpWebResponse)task.Result);
+												responseData = GetData(task.Result);
 			
 							              	}
 							);

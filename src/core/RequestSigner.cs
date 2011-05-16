@@ -15,21 +15,17 @@ namespace McGiv.AWS.SES
 	}
 
 	/// <summary>
+	/// Adds authorisation header to HTTP requests
 	/// see http://docs.amazonwebservices.com/ses/latest/DeveloperGuide/index.html?HMACShaSignatures.html
 	/// and http://docs.amazonwebservices.com/Route53/latest/DeveloperGuide/index.html?RESTAuthentication.html#AuthorizationHeader
 	/// </summary>
 	public class RequestSigner
 	{
 		private readonly KeyedHashAlgorithm _algorithm;
-		private readonly AwsCredentials _credentials;
 		private readonly Func<string, byte[]> _getBytes = Encoding.ASCII.GetBytes;
 
-		public RequestSigner(AwsCredentials credentials, RequestSignerAlgorithm algorithm = RequestSignerAlgorithm.HmacSha1)
+		public RequestSigner(AwsCredentials credentials = null, RequestSignerAlgorithm algorithm = RequestSignerAlgorithm.HmacSha1)
 		{
-			if (credentials == null)
-			{
-				throw new ArgumentNullException("credentials");
-			}
 
 
 			switch (algorithm)
@@ -53,11 +49,23 @@ namespace McGiv.AWS.SES
 			}
 
 
-			_credentials = credentials;
-			_algorithm.Key = _getBytes(_credentials.SecretAccessKey);
+			Credentials = credentials;
 			RequestSignerAlgorithm = algorithm;
 		}
 
+		private AwsCredentials _credentials;
+		public AwsCredentials Credentials
+		{
+			get { return _credentials; }
+			set { _credentials = value;
+			
+				if(value != null)
+				{
+					_algorithm.Key = _getBytes(Credentials.SecretAccessKey);
+				}
+			
+			}
+		}
 
 		public RequestSignerAlgorithm RequestSignerAlgorithm { get; private set; }
 
@@ -67,6 +75,12 @@ namespace McGiv.AWS.SES
 		/// <param name="request"></param>
 		public void SignRequest(HttpWebRequest request)
 		{
+
+			if (Credentials == null)
+			{
+				throw new InvalidOperationException("Credentials property is null.");
+			}
+
 			// date header
 			request.Date = DateTime.UtcNow;
 
@@ -77,7 +91,7 @@ namespace McGiv.AWS.SES
 			// e.g Tue, 25 May 2010 23:05:27 GMT // todo make more generic
 			var sb = new StringBuilder();
 			sb.Append("AWS3-HTTPS AWSAccessKeyId=");
-			sb.Append(_credentials.AccessKeyID);
+			sb.Append(Credentials.AccessKeyID);
 
 
 			sb.Append(", Algorithm=");

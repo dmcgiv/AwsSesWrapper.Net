@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 
 namespace McGiv.AWS.SES
@@ -6,6 +7,7 @@ namespace McGiv.AWS.SES
 	/// <summary>
 	/// see http://docs.amazonwebservices.com/ses/latest/APIReference/index.html?API_VerifyEmailAddress.html
 	/// </summary>
+	[Serializable]
 	public class VerifyEmailAddressCommand : ICommand
 	{
 		public string EmailAddress { get; set; }
@@ -28,10 +30,15 @@ namespace McGiv.AWS.SES
 		#endregion
 	}
 
-
-	public class VerifierEmailAddressCommandResponseParser : CommandResponseParser
+	[Serializable]
+	public class VerifyEmailAddressResponse : Response
 	{
-		public VerifierEmailAddressCommandResponseParser()
+	}
+
+
+	public class VerifyEmailAddressResponseParser : ResponseParser<VerifyEmailAddressResponse>
+	{
+		public VerifyEmailAddressResponseParser()
 			: base("VerifyEmailAddressResponse")
 		{
 		}

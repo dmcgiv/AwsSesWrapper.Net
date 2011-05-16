@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Xml;
 
 namespace McGiv.AWS.SES
@@ -8,6 +7,7 @@ namespace McGiv.AWS.SES
 	/// <summary>
 	/// http://docs.amazonwebservices.com/ses/latest/APIReference/index.html?API_GetSendStatistics.html
 	/// </summary>
+	[Serializable]
 	public class GetSendStatisticsCommand : ICommand
 	{
 		#region ICommand Members
@@ -27,16 +27,43 @@ namespace McGiv.AWS.SES
 
 
 	[Serializable]
-	public class SendStatistics
+	public class GetSendStatisticsResponse : Response
 	{
+		public SendStatistic[] SendStatistics { get; set; }
+
+	}
+
+	[Serializable]
+	public class SendStatistic
+	{
+
+		/// <summary>
+		/// Number of emails that have been enqueued for sending.
+		/// </summary>
 		public int DeliveryAttempts { get; set; }
+
+		/// <summary>
+		/// Time of the data point.
+		/// </summary>
 		public DateTime Timestamp { get; set; }
+
+		/// <summary>
+		/// Number of emails rejected by Amazon SES.
+		/// </summary>
 		public int Rejects { get; set; }
+
+		/// <summary>
+		/// Number of emails that have bounced.
+		/// </summary>
 		public int Bounces { get; set; }
+
+		/// <summary>
+		/// Number of unwanted emails that were rejected by recipients.
+		/// </summary>
 		public int Complaints { get; set; }
 	}
 
-	public class SendStatisticsResponseParser : ICommandResponseParser<SendStatistics[]>
+	public class GetSendStatisticsResponseParser : ResponseParser<GetSendStatisticsResponse>
 	{
 		/*
 SendStatisticsTests.SendStatistics : Passed<GetSendStatisticsResponse xmlns="http://ses.amazonaws.com/doc/2010-12-01/">
@@ -93,48 +120,53 @@ SendStatisticsTests.SendStatistics : Passed<GetSendStatisticsResponse xmlns="htt
 
 
 		 * */
-		public SendStatistics[] Process(Stream input)
+
+		public GetSendStatisticsResponseParser()
+			: base("GetSendStatisticsResponse")
 		{
-			// SendDataPoints
+		}
 
+		protected override void InnerParse(XmlReader reader, GetSendStatisticsResponse response)
+		{
+			var list = new List<SendStatistic>();
 
-			var list = new List<SendStatistics>();
-
-
-			using (XmlReader reader = XmlReader.Create(input))
+			reader.ReadStartElement("GetSendStatisticsResult");
+			while (reader.Read())
 			{
-				reader.MoveToContent();
-
-				while (reader.Read())
+				if (reader.NodeType != XmlNodeType.Element)
 				{
-					if (reader.NodeType == XmlNodeType.Element)
-					{
-						switch (reader.Name)
-						{
-							case "GetSendStatisticsResponse":
-							case "GetSendStatisticsResult":
-							case "SendDataPoints":
-								{
-									
-									break;
-								}
+					continue;
+				}
 
-							case "member":
-								{
-									list.Add(GetStat(reader));
-									break;
-								}
+				switch (reader.Name)
+				{
+					case "GetSendStatisticsResponse":
+					case "GetSendStatisticsResult":
+					case "SendDataPoints":
+						{
+
+							break;
 						}
-					}
+
+					case "member":
+						{
+							list.Add(GetStat(reader));
+							break;
+						}
+					case "ResponseMetadata":
+						{
+							goto completed;
+						}
 				}
 			}
 
-
-			return list.ToArray();
-
+			completed:
+			response.SendStatistics = list.ToArray();
 		}
 
-		static SendStatistics GetStat(XmlReader reader)
+
+
+		static SendStatistic GetStat(XmlReader reader)
 		{
 			/*
 <member>
@@ -147,7 +179,7 @@ SendStatisticsTests.SendStatistics : Passed<GetSendStatisticsResponse xmlns="htt
 			 * 
 			 */
 
-			var stat = new SendStatistics();
+			var stat = new SendStatistic();
 			
 			
 			reader.Read();

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Xml;
 
 namespace McGiv.AWS.SES
@@ -8,6 +7,7 @@ namespace McGiv.AWS.SES
 	/// <summary>
 	/// see http://docs.amazonwebservices.com/ses/latest/APIReference/index.html?API_SendEmail.html
 	/// </summary>
+	[Serializable]
 	public class SendEmailCommand : ICommand
 	{
 		public SendEmailCommand()
@@ -58,13 +58,16 @@ namespace McGiv.AWS.SES
 	}
 
 
-	public class SendInfo : CommandResponse
+
+	[Serializable]
+	public class SendEmailResponse : Response
 	{
 		public string MessageID { get; set; }
 	}
 
 
-	public class SendEmailResponseParser : ICommandResponseParser<SendInfo>
+
+	public class SendEmailResponseParser : ResponseParser<SendEmailResponse>
 	{
 		// example
 		/*
@@ -81,45 +84,43 @@ namespace McGiv.AWS.SES
 
 		#region ICommandResponseParser<SendQuote> Members
 
-		public SendInfo Process(Stream input)
+		public SendEmailResponseParser()
+			: base("SendEmailResponse")
 		{
-			var info = new SendInfo();
-			using (XmlReader reader = XmlReader.Create(input))
-			{
-				reader.MoveToContent();
+		}
 
-				while (reader.Read())
+		protected override void InnerParse(XmlReader reader, SendEmailResponse response)
+		{
+
+			reader.ReadStartElement("SendEmailResult");
+			while (reader.Read())
+			{
+				if (reader.NodeType != XmlNodeType.Element)
 				{
-					if (reader.NodeType == XmlNodeType.Element)
-					{
-						switch (reader.Name)
+					continue;
+				}
+
+				switch (reader.Name)
+				{
+					case "MessageId":
 						{
-							case "MessageId":
-								{
-									info.MessageID = GetNextValue(reader);
-									break;
-								}
-		
+							response.MessageID = GetNextValue(reader);
+							break;
 						}
-					}
+					case "ResponseMetadata":
+						{
+							return;
+						}
+
 				}
 			}
-
-
-			return info;
 		}
+
+
 
 		#endregion
 
-		private static string GetNextValue(XmlReader reader)
-		{
-			if (reader.Read() && reader.NodeType == XmlNodeType.Text)
-			{
-				return reader.Value;
-			}
-
-			throw new FormatException();
-		}
+		
 	}
 
 }

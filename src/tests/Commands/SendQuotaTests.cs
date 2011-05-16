@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Net;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
-namespace McGiv.AWS.SES.Tests.Commands
+namespace McGiv.AWS.SES.Tests
 {
 	[TestFixture]
 	public class SendQuotaTests
 	{
-		private readonly CommandRequestBuilder _builder = new CommandRequestBuilder(new RequestSigner(Helper.GetCredentials()));
+		private readonly CommandProcessor _cp = CommandProcessor.Create(Helper.GetCredentials());
+	
 
 		[Test]
 		public void SendQuota()
@@ -17,14 +17,8 @@ namespace McGiv.AWS.SES.Tests.Commands
 			var cmd = new GetSendQuotaCommand();
 
 
-			//HttpWebRequest request = builder.Build(cmd);
 
-			//Helper.ProcessRequest(request);
-
-
-			var cp = new CommandProcessor(_builder);
-
-			GetSendQuoteResponse resp = cp.Process(cmd, new GetSendQuoteResponseParser());
+			GetSendQuoteResponse resp = _cp.Process(cmd, new GetSendQuoteResponseParser());
 			Console.WriteLine(resp.Command + " : ID " + resp.RequestID);
 
 			Console.WriteLine("Max24HourSend = " + resp.Max24HourSend);
@@ -42,8 +36,11 @@ namespace McGiv.AWS.SES.Tests.Commands
 			for(int i=0; i<10; i++)
 			{
 				var cmd = new GetSendQuotaCommand();
-				var cp = new CommandProcessor(_builder);
-				GetSendQuoteResponse quote = cp.Process(cmd, new GetSendQuoteResponseParser());
+
+				GetSendQuoteResponse response = _cp.Process(cmd, new GetSendQuoteResponseParser());
+
+				Console.WriteLine(response.Command + " : ID " + response.RequestID);
+				
 			
 			}
 
@@ -57,13 +54,13 @@ namespace McGiv.AWS.SES.Tests.Commands
 			var sw = new Stopwatch();
 			sw.Start();
 
-			int count = 10;
+			const int count = 10;
 			var tasks = new Task<GetSendQuoteResponse>[count];
 			for (int i = 0; i < count; i++)
 			{
 				var cmd = new GetSendQuotaCommand();
-				var cp = new CommandProcessor(_builder);
-				tasks[i] = cp.CreateTask(cmd, new GetSendQuoteResponseParser());
+
+				tasks[i] = _cp.CreateTask(cmd, new GetSendQuoteResponseParser());
 
 			}
 

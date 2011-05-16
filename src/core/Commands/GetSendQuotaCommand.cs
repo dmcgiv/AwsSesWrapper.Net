@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Xml;
 
 namespace McGiv.AWS.SES
 {
+
+
 	/// <summary>
 	/// see http://docs.amazonwebservices.com/ses/latest/APIReference/index.html?API_GetSendQuota.html
 	/// </summary>
+	[Serializable]
 	public class GetSendQuotaCommand : ICommand
 	{
 		#region ICommand Members
@@ -26,15 +28,26 @@ namespace McGiv.AWS.SES
 	}
 
 	[Serializable]
-	public class GetSendQuoteResponse : CommandResponse
+	public class GetSendQuoteResponse : Response
 	{
+		/// <summary>
+		/// The maximum number of emails the user is allowed to send in a 24-hour interval.
+		/// </summary>
 		public float SentLast24Hours { get; set; }
+
+		/// <summary>
+		/// The maximum number of emails the user is allowed to send per second.
+		/// </summary>
 		public float Max24HourSend { get; set; }
+
+		/// <summary>
+		/// The number of emails sent during the previous 24 hours.
+		/// </summary>
 		public float MaxSendRate { get; set; }
 	}
 
 
-	public class GetSendQuoteResponseParser : ICommandResponseParser<GetSendQuoteResponse>
+	public class GetSendQuoteResponseParser : ResponseParser<GetSendQuoteResponse>
 	{
 		// example
 		/*
@@ -52,56 +65,53 @@ namespace McGiv.AWS.SES
 
 		#region ICommandResponseParser<SendQuote> Members
 
-		public GetSendQuoteResponse Process(Stream input)
+		public GetSendQuoteResponseParser()
+			: base("GetSendQuotaResponse")
 		{
-			var quota = new GetSendQuoteResponse();
-			quota.Command = "GetSendQuotaResponse";
-
-			using (XmlReader reader = XmlReader.Create(input))
-			{
-				//reader.MoveToContent();
-				reader.ReadStartElement(quota.Command);
-				reader.ReadStartElement("GetSendQuotaResult");
-				while (reader.Read())
-				{
-					if (reader.NodeType == XmlNodeType.Element)
-					{
-						switch (reader.Name)
-						{
-							case "SentLast24Hours":
-								{
-									quota.SentLast24Hours = GetNextValue(reader);
-									break;
-								}
-							case "Max24HourSend":
-								{
-									quota.Max24HourSend = GetNextValue(reader);
-									break;
-								}
-							case "MaxSendRate":
-								{
-									quota.MaxSendRate = GetNextValue(reader);
-									break;
-								}
-						}
-					}
-				}
-			}
-
-
-			return quota;
 		}
+
+
+		protected override void InnerParse(XmlReader reader, GetSendQuoteResponse response)
+		{
+
+			reader.ReadStartElement("GetSendQuotaResult");
+			while (reader.Read())
+			{
+				if (reader.NodeType != XmlNodeType.Element)
+				{
+					continue;
+				}
+
+				switch (reader.Name)
+				{
+					case "SentLast24Hours":
+						{
+							response.SentLast24Hours = GetNextFloatValue(reader);
+							break;
+						}
+					case "Max24HourSend":
+						{
+							response.Max24HourSend = GetNextFloatValue(reader);
+							break;
+						}
+					case "MaxSendRate":
+						{
+							response.MaxSendRate = GetNextFloatValue(reader);
+							break;
+						}
+					case "ResponseMetadata":
+						{
+							return;
+						}
+				}
+
+			}
+			
+		}
+
 
 		#endregion
 
-		private static float GetNextValue(XmlReader reader)
-		{
-			if (reader.Read() && reader.NodeType == XmlNodeType.Text)
-			{
-				return float.Parse(reader.Value);
-			}
-
-			throw new FormatException();
-		}
+		
 	}
 }

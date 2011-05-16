@@ -1,46 +1,16 @@
 ﻿using System;
-using System.IO;
-using System.Net;
-using System.Text;
 using NUnit.Framework;
 
 namespace McGiv.AWS.SES.Tests
 {
 	[TestFixture]
-	[Ignore("This will cause AWS to send an email to the email address used. Run test by commenting out this attribute.")]
+	//[Ignore("This will cause AWS to send an email to the email address used. Run test by commenting out this attribute.")]
 	public class VerifyEmailTests
 	{
 		private readonly CommandRequestBuilder _builder = new CommandRequestBuilder(new RequestSigner(Helper.GetCredentials()));
-		private readonly VerifierEmailAddressCommandResponseParser _parser = new VerifierEmailAddressCommandResponseParser();
+		private readonly VerifyEmailAddressResponseParser _parser = new VerifyEmailAddressResponseParser();
 
 
-		private static void FinishWebRequest(IAsyncResult result)
-		{
-			var response = (HttpWebResponse) ((HttpWebRequest) result.AsyncState).EndGetResponse(result);
-
-			//using (var dataStream = response.GetResponseStream())
-			Stream dataStream = response.GetResponseStream();
-			{
-				if (dataStream == null)
-				{
-					Assert.Fail("GetResponseStream is null");
-				}
-
-				new AsyncStreamReader(dataStream, data =>
-				                                  	{
-				                                  		response.Close();
-
-				                                  		ProcessRequest(data);
-				                                  	});
-			}
-		}
-
-		private static void ProcessRequest(byte[] data)
-		{
-			string resp = Encoding.ASCII.GetString(data);
-
-			Console.WriteLine(resp);
-		}
 
 		[Test]
 		public void VerifyTest()

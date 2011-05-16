@@ -15,9 +15,9 @@ namespace McGiv.AWS.SES.Tests
 		]
 		public void Hash(string date, string key, string hash)
 		{
-			var _signer = new RequestSigner(Helper.GetCredentials(key));
+			var signer = new RequestSigner(Helper.GetCredentials(key));
 
-			Assert.AreEqual(hash, _signer.GenerateSignature(date));
+			Assert.AreEqual(hash, signer.GenerateSignature(date));
 		}
 	}
 }
